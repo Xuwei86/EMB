@@ -1,0 +1,237 @@
+SegEncoderDecoder(
+  (encoder): MambaConv(
+    (conv_1): Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False, normalization=SyncBatchNorm, activation=Swish)
+    (layer_1): Sequential(
+      (0): InvertedResidual(in_channels=16, out_channels=32, stride=1, exp=2, dilation=1, skip_conn=False)
+    )
+    (layer_2): Sequential(
+      (0): InvertedResidual(in_channels=32, out_channels=64, stride=2, exp=2, dilation=1, skip_conn=False)
+      (1): InvertedResidual(in_channels=64, out_channels=64, stride=1, exp=2, dilation=1, skip_conn=True)
+      (2): InvertedResidual(in_channels=64, out_channels=64, stride=1, exp=2, dilation=1, skip_conn=True)
+    )
+    (layer_3): Sequential(
+      (0): InvertedResidual(in_channels=64, out_channels=96, stride=2, exp=2, dilation=1, skip_conn=False)
+      (1): MoConvBlock
+      (2): MoConvBlock
+      (3): LayerNorm()
+    )
+    (layer_4): Sequential(
+      (0): InvertedResidual(in_channels=96, out_channels=128, stride=1, exp=2, dilation=1, skip_conn=False)
+      (1): nnMam
+      (2): nnMam
+      (3): nnMam
+      (4): nnMam
+      (5): LayerNorm()
+    )
+    (layer_5): Sequential(
+      (0): InvertedResidual(in_channels=128, out_channels=160, stride=1, exp=2, dilation=2, skip_conn=False)
+      (1): nnMam
+      (2): nnMam
+      (3): nnMam
+      (4): LayerNorm()
+    )
+    (conv_1x1_exp): None
+    (classifier): None
+  )
+  (seg_head): DeeplabV3(
+    (aux_head): Sequential(
+      (0): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False, normalization=SyncBatchNorm, activation=ReLU)
+      (1): Dropout2d(p=0.1, inplace=False)
+      (2): Conv2d(128, 150, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (upsample_seg_out): UpSample(scale_factor=8.0, mode='bilinear')
+    (aspp): Sequential(
+      (aspp_layer): ASPP(in_channels=160, out_channels=512, atrous_rates=[12, 24, 36], is_aspp_sep=False, dropout=0.1)
+    )
+    (classifier): Conv2d(512, 150, kernel_size=(1, 1), stride=(1, 1))
+  )
+)
+=================================================================
+                  SegEncoderDecoder Summary
+=================================================================
+Overall parameters   =    5.761 M
+2024-11-11 07:33:51 - LOGS    - FVCore Analysis:
+2024-11-11 07:33:51 - LOGS    - Input sizes: [1, 3, 224, 224]
+| module                                    | #parameters or shape   | #flops     |
+|:------------------------------------------|:-----------------------|:-----------|
+| model                                     | 5.761M                 | 4.851G     |
+|  encoder                                  |  1.824M                |  1.929G    |
+|   encoder.conv_1.block                    |   0.464K               |   5.82M    |
+|    encoder.conv_1.block.conv              |    0.432K              |    5.419M  |
+|    encoder.conv_1.block.norm              |    32                  |    0.401M  |
+|   encoder.layer_1.0.block                 |   2.016K               |   25.289M  |
+|    encoder.layer_1.0.block.exp_1x1.block  |    0.576K              |    7.225M  |
+|    encoder.layer_1.0.block.conv_3x3.block |    0.352K              |    4.415M  |
+|    encoder.layer_1.0.block.red_1x1.block  |    1.088K              |    13.648M |
+|   encoder.layer_2                         |   43.456K              |   0.157G   |
+|    encoder.layer_2.0.block                |    7.104K              |    42.75M  |
+|    encoder.layer_2.1.block                |    18.176K             |    57M     |
+|    encoder.layer_2.2.block                |    18.176K             |    57M     |
+|   encoder.layer_3                         |   0.202M               |   0.18G    |
+|    encoder.layer_3.0.block                |    22.336K             |    37.381M |
+|    encoder.layer_3.1                      |    89.616K             |    71.205M |
+|    encoder.layer_3.2                      |    89.616K             |    71.205M |
+|    encoder.layer_3.3                      |    0.192K              |    0       |
+|   encoder.layer_4                         |   0.72M                |   0.718G   |
+|    encoder.layer_4.0.block                |    45.76K              |    35.876M |
+|    encoder.layer_4.1                      |    0.169M              |    0.171G  |
+|    encoder.layer_4.2                      |    0.169M              |    0.171G  |
+|    encoder.layer_4.3                      |    0.169M              |    0.171G  |
+|    encoder.layer_4.4                      |    0.169M              |    0.171G  |
+|    encoder.layer_4.5                      |    0.256K              |    0       |
+|   encoder.layer_5                         |   0.856M               |   0.843G   |
+|    encoder.layer_5.0.block                |    77.376K             |    60.663M |
+|    encoder.layer_5.1                      |    0.26M               |    0.261G  |
+|    encoder.layer_5.2                      |    0.26M               |    0.261G  |
+|    encoder.layer_5.3                      |    0.26M               |    0.261G  |
+|    encoder.layer_5.4                      |    0.32K               |    0       |
+|  seg_head                                 |  3.937M                |  2.922G    |
+|   seg_head.aux_head                       |   0.167M               |            |
+|    seg_head.aux_head.0.block              |    0.148M              |            |
+|    seg_head.aux_head.2.block.conv         |    19.35K              |            |
+|   seg_head.aspp.aspp_layer                |   3.693M               |   2.832G   |
+|    seg_head.aspp.aspp_layer.convs         |    2.381M              |    1.803G  |
+|    seg_head.aspp.aspp_layer.project.block |    1.312M              |    1.028G  |
+|   seg_head.classifier.block.conv          |   76.95K               |   60.211M  |
+|    seg_head.classifier.block.conv.weight  |    (150, 512, 1, 1)    |            |
+|    seg_head.classifier.block.conv.bias    |    (150,)              |            |
+|   seg_head.upsample_seg_out               |                        |   30.106M  |
+2024-11-11 07:33:52 - WARNING - 
+** Please be cautious when using the results in papers. Certain operations may or may not be accounted in FLOP computation in FVCore. Therefore, you want to manually ensure that FLOP computation is correct.
+2024-11-11 07:33:52 - WARNING - Uncalled Modules:
+{'encoder.layer_5.1.attn0.conv_local.conv', 'encoder.layer_5.3.norm1', 'encoder.layer_5.3.attn0.v.norm', 'encoder.layer_3.2.attn0.drop_path', 'encoder.layer_3.1.attn0.conv_local', 'encoder.layer_5.2.norm1', 'encoder.layer_5.2.drop_path_1', 'encoder.layer_3.2.attn0.conv_local.drop_path', 'encoder.layer_3.1.attn0.drop_path', 'encoder.layer_3.2.attn0.conv_local.norm', 'encoder.layer_4.2.attn0.qk.act', 'encoder.layer_4.4.attn0.qk.drop_path', 'encoder.layer_3.1.attn0.qk.act', 'encoder.layer_5.1.mamba.dt_proj', 'encoder.layer_5.3.drop_path_1', 'encoder.layer_4.3.attn0.conv_local.conv', 'encoder.layer_4.3.attn0.conv_local.norm', 'encoder.layer_4.4.attn0.qk.act', 'encoder.layer_3.2.attn0.qk.act', 'encoder.layer_4.3.norm1', 'encoder.layer_3.2.attn0.qk.norm', 'encoder.layer_3.1.attn0.qk.norm', 'encoder.layer_5.3.mamba.dt_proj', 'encoder.layer_5.1.attn0.conv_local.act', 'encoder.layer_3.2.drop_path_0', 'encoder.layer_4.3.attn0.v.drop_path', 'encoder.layer_5.2.attn0.qk.norm', 'encoder.layer_5.1.attn0.conv_local.norm', 'encoder.layer_5.1.drop_path_1', 'encoder.layer_3.2.attn0.proj_drop', 'encoder.layer_5.3.attn0.conv_local.conv', 'encoder.layer_4.4.mamba.in_proj', 'encoder.layer_4.3.mamba.dt_proj', 'encoder.layer_4.2.attn0.v.drop_path', 'seg_head.aux_head.0.block.act', 'encoder.layer_5.2.attn0.v.norm', 'encoder.layer_5.1.attn0.qk.norm', 'encoder.layer_5.2.attn0.qk.act', 'encoder.layer_3.2.attn0.conv_local.act', 'encoder.layer_4.2.attn0.conv_local.drop_path', 'encoder.layer_3.1.attn0.conv_local.act', 'encoder.layer_4.2.norm1', 'seg_head.aux_head.0.block.conv', 'encoder.layer_4.4.attn0.conv_local.drop_path', 'encoder.layer_4.2.mamba.in_proj', 'encoder.layer_4.1.mamba.dt_proj', 'encoder.layer_3.1.attn0.qk.drop_path', 'encoder.layer_5.3.attn0.qk.norm', 'encoder.layer_4.2.attn0.qk.norm', 'encoder.layer_4.1.drop_path_1', 'seg_head.aux_head.1', 'seg_head.aux_head.0.block', 'encoder.layer_4.1.attn0.v.drop_path', 'encoder.layer_3.2.attn0.conv_local', 'encoder.layer_4.4.attn0.conv_local.norm', 'encoder.layer_4.2.attn0.qk.drop_path', 'encoder.layer_4.4.attn0.conv_local.act', 'encoder.layer_5.3.mamba.in_proj', 'encoder.layer_4.1.drop_path_0', 'encoder.layer_3.1.attn0.conv_local.norm', 'encoder.layer_3.1.attn0.conv_local.drop_path', 'seg_head.aux_head', 'encoder.layer_5.3.attn0.v.drop_path', 'encoder.layer_5.3.attn0.qk.act', 'encoder.layer_5.3.attn0.qk.drop_path', 'encoder.layer_5.1.attn0.qk.drop_path', 'encoder.layer_4.3.attn0.conv_local', 'encoder.layer_4.4.mamba.dt_proj', 'encoder.layer_4.3.drop_path_1', 'encoder.layer_4.2.attn0.conv_local.norm', 'encoder.layer_4.2.attn0.conv_local.act', 'encoder.layer_3.1.drop_path_1', 'encoder.layer_5.3.attn0.conv_local', 'encoder.layer_4.4.attn0.qk.norm', 'encoder.layer_5.1.norm1', 'encoder.layer_5.2.mamba.in_proj', 'seg_head.aux_head.0.block.norm', 'encoder.layer_5.1.attn0.v.drop_path', 'encoder.layer_4.2.attn0.conv_local.conv', 'encoder.layer_5.3.attn0.conv_local.norm', 'encoder.layer_3.1.attn0.conv_local.conv', 'encoder.layer_4.4.attn0.conv_local.conv', 'seg_head.aux_head.0', 'seg_head.aux_head.2.block', 'encoder.layer_4.4.attn0.conv_local', 'encoder.layer_4.2.mamba.dt_proj', 'encoder.layer_4.1.attn0.conv_local.drop_path', 'encoder.layer_3.2.attn0.v.norm', 'encoder.layer_5.2.attn0.v.drop_path', 'encoder.layer_4.4.attn0.v.norm', 'encoder.layer_5.1.mamba.in_proj', 'encoder.layer_4.3.mamba.in_proj', 'encoder.layer_3.1.attn0.proj_drop', 'encoder.layer_5.3.attn0.conv_local.drop_path', 'encoder.layer_5.2.attn0.qk.drop_path', 'seg_head.aux_head.2', 'encoder.layer_3.1.attn0.v.drop_path', 'encoder.layer_5.2.attn0.conv_local.act', 'encoder.layer_5.2.attn0.conv_local', 'encoder.layer_4.1.attn0.conv_local.norm', 'encoder.layer_5.2.drop_path_0', 'encoder.layer_4.2.attn0.conv_local', 'encoder.layer_4.1.attn0.conv_local.conv', 'encoder.layer_5.2.mamba.dt_proj', 'encoder.layer_4.4.drop_path_1', 'encoder.layer_4.4.attn0.v.drop_path', 'encoder.layer_5.2.attn0.conv_local.conv', 'encoder.layer_4.2.drop_path_0', 'encoder.layer_5.1.attn0.qk.act', 'encoder.layer_3.2.drop_path_1', 'encoder.layer_5.2.attn0.conv_local.drop_path', 'encoder.layer_4.3.attn0.qk.norm', 'encoder.layer_4.3.attn0.conv_local.drop_path', 'encoder.layer_5.1.attn0.conv_local.drop_path', 'encoder.layer_5.3.attn0.conv_local.act', 'encoder.layer_3.1.drop_path_0', 'encoder.layer_4.3.attn0.qk.drop_path', 'encoder.layer_4.1.attn0.qk.drop_path', 'encoder.layer_4.2.attn0.v.norm', 'encoder.layer_4.4.norm1', 'encoder.layer_4.2.drop_path_1', 'encoder.layer_4.1.attn0.v.norm', 'encoder.layer_4.1.attn0.conv_local', 'encoder.layer_3.2.attn0.conv_local.conv', 'encoder.layer_3.2.attn0.v.drop_path', 'encoder.layer_4.1.mamba.in_proj', 'encoder.layer_5.1.attn0.conv_local', 'encoder.layer_5.2.attn0.conv_local.norm', 'encoder.layer_4.1.attn0.qk.act', 'seg_head.aux_head.2.block.conv', 'encoder.layer_5.1.attn0.v.norm', 'encoder.layer_5.1.drop_path_0', 'encoder.layer_5.3.drop_path_0', 'encoder.layer_3.2.attn0.qk.drop_path', 'encoder.layer_4.3.drop_path_0', 'encoder.layer_4.1.attn0.conv_local.act', 'encoder.layer_3.1.attn0.v.norm', 'encoder.layer_4.1.attn0.qk.norm', 'encoder.layer_4.3.attn0.conv_local.act', 'encoder.layer_4.3.attn0.v.norm', 'encoder.layer_4.1.norm1', 'encoder.layer_4.4.drop_path_0', 'encoder.layer_4.3.attn0.qk.act'}
+2024-11-11 07:33:52 - WARNING - Unsupported Ops:
+Counter({'aten::mul': 438, 'aten::mul_': 119, 'aten::add': 103, 'aten::silu': 68, 'aten::flip': 42, 'aten::mean': 32, 'aten::sub': 28, 'aten::exp': 28, 'aten::neg': 28, 'prim::PythonOp.SelectiveScanFn': 28, 'aten::div': 21, 'aten::rsub': 18, 'aten::pow': 14, 'aten::sqrt': 14, 'aten::sigmoid': 11, 'aten::pad': 9, 'aten::softmax': 9, 'aten::feature_dropout': 1})
+=================================================================
+2024-11-11 07:33:52 - LOGS    - Loss function
+SegCrossEntropy(
+	 ignore_idx=-1
+	 class_weighting=False
+	 label_smoothing=0.0
+	 aux_weight=0.4
+)
+2024-11-11 07:33:52 - LOGS    - Optimizer
+AdamWOptimizer (
+	 amsgrad: [False, False, False, False]
+	 betas: [(0.9, 0.98), (0.9, 0.98), (0.9, 0.98), (0.9, 0.98)]
+	 capturable: [False, False, False, False]
+	 differentiable: [False, False, False, False]
+	 eps: [1e-08, 1e-08, 1e-08, 1e-08]
+	 foreach: [None, None, None, None]
+	 fused: [None, None, None, None]
+	 lr: [0.1, 0.1, 0.1, 0.1]
+	 maximize: [False, False, False, False]
+	 weight_decay: [0.0001, 0.0, 0.0001, 0.0]
+)
+2024-11-11 07:33:52 - LOGS    - Learning rate scheduler
+CosineScheduler(
+ 	 min_lr=0.0001
+ 	 max_lr=0.0008
+ 	 period=120
+ )
+2024-11-11 07:33:52 - LOGS    - Using EMA
+2024-11-11 07:33:52 - INFO    - Configuration file is stored here: segmentation_results/train/config.yaml
+===========================================================================
+2024-11-11 07:33:54 - DEBUG    - Training epoch 0 with 20210 samples
+2024-11-11 07:33:55 - LOGS    - Epoch:   0 [       1/10000000], loss: {'total_loss': 6.9413, 'seg_loss': 4.9204, 'aux_loss': 2.0208}, grad_norm: 0.0001, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.307, Elapsed time:  1.03
+2024-11-11 07:34:59 - LOGS    - Epoch:   0 [     201/10000000], loss: {'total_loss': 3.7477, 'seg_loss': 2.5797, 'aux_loss': 1.1679}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.011, Elapsed time: 65.06
+2024-11-11 07:36:02 - LOGS    - Epoch:   0 [     401/10000000], loss: {'total_loss': 3.381, 'seg_loss': 2.3271, 'aux_loss': 1.0539}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.011, Elapsed time: 128.06
+2024-11-11 07:37:05 - LOGS    - Epoch:   0 [     601/10000000], loss: {'total_loss': 3.1876, 'seg_loss': 2.1915, 'aux_loss': 0.9961}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 191.20
+2024-11-11 07:38:08 - LOGS    - Epoch:   0 [     801/10000000], loss: {'total_loss': 3.0418, 'seg_loss': 2.0896, 'aux_loss': 0.9522}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 254.37
+2024-11-11 07:39:11 - LOGS    - Epoch:   0 [    1001/10000000], loss: {'total_loss': 2.9586, 'seg_loss': 2.0314, 'aux_loss': 0.9272}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 317.55
+2024-11-11 07:40:14 - LOGS    - Epoch:   0 [    1201/10000000], loss: {'total_loss': 2.8763, 'seg_loss': 1.973, 'aux_loss': 0.9033}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 380.66
+2024-11-11 07:41:18 - LOGS    - Epoch:   0 [    1401/10000000], loss: {'total_loss': 2.8105, 'seg_loss': 1.9258, 'aux_loss': 0.8847}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 443.82
+2024-11-11 07:42:21 - LOGS    - Epoch:   0 [    1601/10000000], loss: {'total_loss': 2.7471, 'seg_loss': 1.8809, 'aux_loss': 0.8663}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 507.01
+2024-11-11 07:43:24 - LOGS    - Epoch:   0 [    1801/10000000], loss: {'total_loss': 2.6998, 'seg_loss': 1.8481, 'aux_loss': 0.8517}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 570.16
+2024-11-11 07:44:27 - LOGS    - Epoch:   0 [    2001/10000000], loss: {'total_loss': 2.6642, 'seg_loss': 1.8228, 'aux_loss': 0.8415}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 633.33
+2024-11-11 07:45:30 - LOGS    - Epoch:   0 [    2201/10000000], loss: {'total_loss': 2.6294, 'seg_loss': 1.7982, 'aux_loss': 0.8313}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 696.51
+2024-11-11 07:46:33 - LOGS    - Epoch:   0 [    2401/10000000], loss: {'total_loss': 2.5952, 'seg_loss': 1.7738, 'aux_loss': 0.8214}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 759.68
+2024-11-11 07:47:13 - LOGS    - *** Training summary for epoch 0
+	 loss={'total_loss': 2.5773, 'seg_loss': 1.7612, 'aux_loss': 0.8161} || grad_norm=0.0002
+2024-11-11 07:47:15 - LOGS    - Epoch:   0 [       4/    2000], loss: {'total_loss': 2.1779}, iou: 2.8244, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  0.24
+2024-11-11 07:47:20 - LOGS    - Epoch:   0 [     804/    2000], loss: {'total_loss': 1.2354}, iou: 13.2602, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  5.24
+2024-11-11 07:47:25 - LOGS    - Epoch:   0 [    1604/    2000], loss: {'total_loss': 1.2724}, iou: 13.6748, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time: 10.22
+2024-11-11 07:47:28 - LOGS    - *** Validation summary for epoch 0
+	 loss={'total_loss': 1.2773} || iou=13.5781
+2024-11-11 07:47:30 - LOGS    - Epoch:   0 [       4/    2000], loss: {'total_loss': 4.1789}, iou: 0.5079, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  0.18
+2024-11-11 07:47:35 - LOGS    - Epoch:   0 [     804/    2000], loss: {'total_loss': 3.932}, iou: 1.1383, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  5.23
+2024-11-11 07:47:40 - LOGS    - Epoch:   0 [    1604/    2000], loss: {'total_loss': 3.9469}, iou: 1.1348, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time: 10.28
+2024-11-11 07:47:43 - LOGS    - *** Validation (Ema) summary for epoch 0
+	 loss={'total_loss': 3.9483} || iou=1.1404
+2024-11-11 07:47:43 - LOGS    - Best checkpoint with score 13.58 saved at segmentation_results/train/checkpoint_best.pt
+2024-11-11 07:47:43 - LOGS    - Best EMA checkpoint with score 1.14 saved at segmentation_results/train/checkpoint_ema_best.pt
+2024-11-11 07:47:43 - INFO    - Checkpoints saved at: segmentation_results/train
+======================================================================================================================================================
+===========================================================================
+2024-11-11 07:47:45 - DEBUG    - Training epoch 1 with 20210 samples
+2024-11-11 07:47:46 - LOGS    - Epoch:   1 [    2528/10000000], loss: {'total_loss': 2.9026, 'seg_loss': 1.9539, 'aux_loss': 0.9487}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.335, Elapsed time:  0.65
+2024-11-11 07:48:49 - LOGS    - Epoch:   1 [    2728/10000000], loss: {'total_loss': 2.1669, 'seg_loss': 1.4674, 'aux_loss': 0.6995}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.011, Elapsed time: 63.86
+2024-11-11 07:49:53 - LOGS    - Epoch:   1 [    2928/10000000], loss: {'total_loss': 2.1405, 'seg_loss': 1.4511, 'aux_loss': 0.6894}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.011, Elapsed time: 128.09
+2024-11-11 07:50:57 - LOGS    - Epoch:   1 [    3128/10000000], loss: {'total_loss': 2.1338, 'seg_loss': 1.4454, 'aux_loss': 0.6884}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 191.27
+2024-11-11 07:52:00 - LOGS    - Epoch:   1 [    3328/10000000], loss: {'total_loss': 2.1222, 'seg_loss': 1.4353, 'aux_loss': 0.6869}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 254.39
+2024-11-11 07:53:03 - LOGS    - Epoch:   1 [    3528/10000000], loss: {'total_loss': 2.1096, 'seg_loss': 1.4275, 'aux_loss': 0.6821}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 317.62
+2024-11-11 07:54:06 - LOGS    - Epoch:   1 [    3728/10000000], loss: {'total_loss': 2.1059, 'seg_loss': 1.4246, 'aux_loss': 0.6813}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 380.84
+2024-11-11 07:55:09 - LOGS    - Epoch:   1 [    3928/10000000], loss: {'total_loss': 2.0999, 'seg_loss': 1.4214, 'aux_loss': 0.6785}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 444.09
+2024-11-11 07:56:13 - LOGS    - Epoch:   1 [    4128/10000000], loss: {'total_loss': 2.089, 'seg_loss': 1.4139, 'aux_loss': 0.6751}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 507.25
+2024-11-11 07:57:16 - LOGS    - Epoch:   1 [    4328/10000000], loss: {'total_loss': 2.0803, 'seg_loss': 1.4077, 'aux_loss': 0.6726}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 570.52
+2024-11-11 07:58:19 - LOGS    - Epoch:   1 [    4528/10000000], loss: {'total_loss': 2.0719, 'seg_loss': 1.4014, 'aux_loss': 0.6704}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 633.76
+2024-11-11 07:59:22 - LOGS    - Epoch:   1 [    4728/10000000], loss: {'total_loss': 2.0702, 'seg_loss': 1.4004, 'aux_loss': 0.6698}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 696.94
+2024-11-11 08:00:25 - LOGS    - Epoch:   1 [    4928/10000000], loss: {'total_loss': 2.0622, 'seg_loss': 1.3949, 'aux_loss': 0.6673}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 760.18
+2024-11-11 08:01:05 - LOGS    - *** Training summary for epoch 1
+	 loss={'total_loss': 2.0584, 'seg_loss': 1.3921, 'aux_loss': 0.6664} || grad_norm=0.0002
+2024-11-11 08:01:07 - LOGS    - Epoch:   1 [       4/    2000], loss: {'total_loss': 2.0325}, iou: 2.4852, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  0.16
+2024-11-11 08:01:12 - LOGS    - Epoch:   1 [     804/    2000], loss: {'total_loss': 1.1323}, iou: 17.8568, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  5.18
+2024-11-11 08:01:17 - LOGS    - Epoch:   1 [    1604/    2000], loss: {'total_loss': 1.1514}, iou: 18.4461, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time: 10.18
+2024-11-11 08:01:20 - LOGS    - *** Validation summary for epoch 1
+	 loss={'total_loss': 1.1612} || iou=18.4568
+2024-11-11 08:01:22 - LOGS    - Epoch:   1 [       4/    2000], loss: {'total_loss': 3.5407}, iou: 0.8872, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  0.17
+2024-11-11 08:01:27 - LOGS    - Epoch:   1 [     804/    2000], loss: {'total_loss': 2.7965}, iou: 2.8866, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  5.25
+2024-11-11 08:01:32 - LOGS    - Epoch:   1 [    1604/    2000], loss: {'total_loss': 2.8327}, iou: 2.7551, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time: 10.31
+2024-11-11 08:01:35 - LOGS    - *** Validation (Ema) summary for epoch 1
+	 loss={'total_loss': 2.8347} || iou=2.7746
+2024-11-11 08:01:35 - LOGS    - Best checkpoint with score 18.46 saved at segmentation_results/train/checkpoint_best.pt
+2024-11-11 08:01:35 - LOGS    - Best EMA checkpoint with score 2.77 saved at segmentation_results/train/checkpoint_ema_best.pt
+2024-11-11 08:01:35 - INFO    - Checkpoints saved at: segmentation_results/train
+======================================================================================================================================================
+===========================================================================
+2024-11-11 08:01:37 - DEBUG    - Training epoch 2 with 20210 samples
+2024-11-11 08:01:38 - LOGS    - Epoch:   2 [    5055/10000000], loss: {'total_loss': 2.1081, 'seg_loss': 1.4597, 'aux_loss': 0.6485}, grad_norm: 0.0002, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.313, Elapsed time:  0.64
+2024-11-11 08:02:41 - LOGS    - Epoch:   2 [    5255/10000000], loss: {'total_loss': 1.9705, 'seg_loss': 1.3296, 'aux_loss': 0.6409}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.011, Elapsed time: 63.72
+2024-11-11 08:03:45 - LOGS    - Epoch:   2 [    5455/10000000], loss: {'total_loss': 1.9591, 'seg_loss': 1.319, 'aux_loss': 0.6401}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 127.92
+2024-11-11 08:04:48 - LOGS    - Epoch:   2 [    5655/10000000], loss: {'total_loss': 1.9462, 'seg_loss': 1.3112, 'aux_loss': 0.635}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 191.10
+2024-11-11 08:05:51 - LOGS    - Epoch:   2 [    5855/10000000], loss: {'total_loss': 1.9305, 'seg_loss': 1.2996, 'aux_loss': 0.6309}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 254.21
+2024-11-11 08:06:55 - LOGS    - Epoch:   2 [    6055/10000000], loss: {'total_loss': 1.9413, 'seg_loss': 1.3061, 'aux_loss': 0.6352}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 317.41
+2024-11-11 08:07:58 - LOGS    - Epoch:   2 [    6255/10000000], loss: {'total_loss': 1.9488, 'seg_loss': 1.3108, 'aux_loss': 0.638}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 380.60
+2024-11-11 08:09:01 - LOGS    - Epoch:   2 [    6455/10000000], loss: {'total_loss': 1.9332, 'seg_loss': 1.3001, 'aux_loss': 0.6331}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 443.80
+2024-11-11 08:10:04 - LOGS    - Epoch:   2 [    6655/10000000], loss: {'total_loss': 1.9398, 'seg_loss': 1.3052, 'aux_loss': 0.6346}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 506.95
+2024-11-11 08:11:07 - LOGS    - Epoch:   2 [    6855/10000000], loss: {'total_loss': 1.9358, 'seg_loss': 1.3023, 'aux_loss': 0.6335}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 570.15
+2024-11-11 08:12:11 - LOGS    - Epoch:   2 [    7055/10000000], loss: {'total_loss': 1.9338, 'seg_loss': 1.301, 'aux_loss': 0.6328}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 633.39
+2024-11-11 08:13:14 - LOGS    - Epoch:   2 [    7255/10000000], loss: {'total_loss': 1.9254, 'seg_loss': 1.2951, 'aux_loss': 0.6302}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 696.49
+2024-11-11 08:14:17 - LOGS    - Epoch:   2 [    7455/10000000], loss: {'total_loss': 1.9238, 'seg_loss': 1.2942, 'aux_loss': 0.6296}, grad_norm: 0.0003, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.010, Elapsed time: 759.70
+2024-11-11 08:14:57 - LOGS    - *** Training summary for epoch 2
+	 loss={'total_loss': 1.9186, 'seg_loss': 1.2905, 'aux_loss': 0.6281} || grad_norm=0.0003
+2024-11-11 08:14:59 - LOGS    - Epoch:   2 [       4/    2000], loss: {'total_loss': 2.1683}, iou: 2.5733, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  0.17
+2024-11-11 08:15:04 - LOGS    - Epoch:   2 [     804/    2000], loss: {'total_loss': 1.0582}, iou: 19.6755, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  5.20
+2024-11-11 08:15:09 - LOGS    - Epoch:   2 [    1604/    2000], loss: {'total_loss': 1.0894}, iou: 20.4152, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time: 10.17
+2024-11-11 08:15:11 - LOGS    - *** Validation summary for epoch 2
+	 loss={'total_loss': 1.0957} || iou=20.6778
+2024-11-11 08:15:13 - LOGS    - Epoch:   2 [       4/    2000], loss: {'total_loss': 2.9994}, iou: 1.3981, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  0.17
+2024-11-11 08:15:19 - LOGS    - Epoch:   2 [     804/    2000], loss: {'total_loss': 2.0866}, iou: 4.9494, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time:  5.26
+2024-11-11 08:15:24 - LOGS    - Epoch:   2 [    1604/    2000], loss: {'total_loss': 2.1272}, iou: 4.7195, LR: [0.0008, 0.0008, 0.0008, 0.0008], Avg. batch load time: 0.000, Elapsed time: 10.33
+2024-11-11 08:15:26 - LOGS    - *** Validation (Ema) summary for epoch 2
+	 loss={'total_loss': 2.129} || iou=4.7469
+2024-11-11 08:15:26 - LOGS    - Best checkpoint with score 20.68 saved at segmentation_results/train/checkpoint_best.pt
+2024-11-11 08:15:26 - LOGS    - Best EMA checkpoint with score 4.75 saved at segmentation_results/train/checkpoint_ema_best.pt
+2024-11-11 08:15:27 - INFO    - Checkpoints saved at: segmentation_results/train
+======================================================================================================================================================
+===========================================================================
+2024-11-11 08:15:29 - DEBUG    - Training epoch 3 with 20210 samples
+2024-11-11 08:15:29 - LOGS    - Epoch:   3 [    7582/10000000], loss: {'total_loss': 2.0759, 'seg_loss': 1.3844, 'aux_loss': 0.6915}, grad_norm: 0.0004, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.310, Elapsed time:  0.65
+2024-11-11 08:16:32 - LOGS    - Epoch:   3 [    7782/10000000], loss: {'total_loss': 1.7774, 'seg_loss': 1.1828, 'aux_loss': 0.5946}, grad_norm: 0.0003, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.011, Elapsed time: 63.79
+2024-11-11 08:17:36 - LOGS    - Epoch:   3 [    7982/10000000], loss: {'total_loss': 1.8143, 'seg_loss': 1.2119, 'aux_loss': 0.6024}, grad_norm: 0.0003, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.011, Elapsed time: 127.03
+2024-11-11 08:18:39 - LOGS    - Epoch:   3 [    8182/10000000], loss: {'total_loss': 1.8072, 'seg_loss': 1.2063, 'aux_loss': 0.6008}, grad_norm: 0.0003, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.010, Elapsed time: 190.23
+2024-11-11 08:19:43 - LOGS    - Epoch:   3 [    8382/10000000], loss: {'total_loss': 1.811, 'seg_loss': 1.2101, 'aux_loss': 0.6009}, grad_norm: 0.0003, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.010, Elapsed time: 254.72
+2024-11-11 08:20:50 - LOGS    - Epoch:   3 [    8582/10000000], loss: {'total_loss': 1.8182, 'seg_loss': 1.2151, 'aux_loss': 0.6031}, grad_norm: 0.0003, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.010, Elapsed time: 321.11
+2024-11-11 08:21:56 - LOGS    - Epoch:   3 [    8782/10000000], loss: {'total_loss': 1.8067, 'seg_loss': 1.2072, 'aux_loss': 0.5995}, grad_norm: 0.0002, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.010, Elapsed time: 387.53
+2024-11-11 08:23:03 - LOGS    - Epoch:   3 [    8982/10000000], loss: {'total_loss': 1.7997, 'seg_loss': 1.202, 'aux_loss': 0.5976}, grad_norm: 0.0002, LR: [0.000799, 0.000799, 0.000799, 0.000799], Avg. batch load time: 0.010, Elapsed time: 453.85
+
